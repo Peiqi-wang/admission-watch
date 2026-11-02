@@ -33,6 +33,8 @@ SCHOOLS = {
         "id_env": "NSYSU_ID",
         "domains": ["nsysu.edu.tw"],
         "seeds": [
+            "https://oaa.nsysu.edu.tw/p/403-1003-867-1.php?Lang=zh-tw",
+            "https://oaa.nsysu.edu.tw/p/403-1003-878.php?Lang=zh-tw",
             "https://oaa.nsysu.edu.tw/",
             "https://exam-oaa.nsysu.edu.tw/p/412-1065-2038.php?Lang=zh-tw",
             "https://exam-acad.nsysu.edu.tw/exam_netlist/netlist_main.php?ExmNo=11",
@@ -112,7 +114,7 @@ def is_result_notice(text):
     # 考試入學（筆試）、在職專班、博士班、轉學等不相干的排除
     if re.search(r"(考試入學|入學考試|在職|博士|轉學|學士|學分班|EMBA)", text) and "甄試" not in text:
         return False
-    if re.search(r"(在職|博士|轉學|學士班|學分班|EMBA|抵免|聲明書|切結書|工讀|招募|簡章|報名人數)", text):
+    if re.search(r"(在職|博士|轉學|學士班|學分班|EMBA|抵免|聲明書|切結書|工讀|招募|簡章|報名人數|專班|特殊選才|學士|海納百川)", text):
         return False
     return has_year or "甄試" in text
 
