@@ -177,19 +177,28 @@ def crawl_school(session, name, cfg, sid):
 
     # 打開候選公告（以及公告裡的附件）搜尋應考證號
     for url, title in list(notices.items())[:25]:
-        resp = fetch(session, url)
-        if resp is None:
-            continue
-        docs = [(title, resp)]
-        for text, href in page_links(resp):
-            if re.search(r"\.(pdf)(\?|$)", href, re.I) or is_result_notice(text) or "附件" in text or "下載" in text:
-                r2 = fetch(session, href)
-                if r2 is not None:
-                    docs.append((f"{title} / {text[:60]}", r2))
-        for t, r in docs:
-            if id_in(doc_text(r), sid):
-                hits.append((t, r.url))
+        hits.extend(check_notice(session, url, title, sid))
     return notices, hits
+
+
+def check_notice(session, url, title, sid, show=False):
+    hits = []
+    resp = fetch(session, url)
+    if resp is None:
+        return hits
+    docs = [(title, resp)]
+    for text, href in page_links(resp):
+        if re.search(r"\.(pdf)(\?|$)", href, re.I) or is_result_notice(text) or "附件" in text or "下載" in text:
+            r2 = fetch(session, href)
+            if r2 is not None:
+                docs.append((f"{title} / {text[:60]}", r2))
+    for t, r in docs:
+        txt = doc_text(r)
+        if show:
+            log(f"--- {r.url} ({len(txt)} 字)\n{txt[:1500]}")
+        if id_in(txt, sid):
+            hits.append((t, r.url))
+    return hits
 
 
 def load_state():
@@ -227,6 +236,16 @@ def send_mail(subject, body):
 def main():
     global DEBUG
     DEBUG = "--debug" in sys.argv
+    selftest = os.environ.get("SELFTEST_URL")
+    if selftest:
+        sid = os.environ.get("SELFTEST_ID", "")
+        hits = check_notice(requests.Session(), selftest, "自我測試名單", sid, show=not sid)
+        log(f"自我測試：號碼 {sid or '(未提供)'} 找到 {len(hits)} 處")
+        if sid:
+            body = ("這是完整流程測試（拿中央資管去年的名單當範例）。\n\n" +
+                    ("\n".join(f"✅ 在「{t}」找到測試號碼\n   {u}" for t, u in hits) if hits else "❌ 沒找到測試號碼"))
+            send_mail("🧪 名單比對測試：" + ("成功" if hits else "失敗"), body)
+        return
     dump = os.environ.get("DUMP_URL")
     if dump:
         r = fetch(requests.Session(), dump)

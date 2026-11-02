@@ -21,6 +21,14 @@ on:
         description: "（除錯）列出某網頁的所有連結"
         type: string
         default: ""
+      selftest_url:
+        description: "（測試）把這個網址當成名單來比對"
+        type: string
+        default: ""
+      selftest_id:
+        description: "（測試）要找的號碼"
+        type: string
+        default: ""
 
 permissions:
   contents: write
@@ -49,6 +57,8 @@ jobs:
           NCU_ID: ${{ secrets.NCU_ID }}
           TARGET_YEAR: ${{ inputs.year || '116' }}
           DUMP_URL: ${{ inputs.dump_url }}
+          SELFTEST_URL: ${{ inputs.selftest_url }}
+          SELFTEST_ID: ${{ inputs.selftest_id }}
         run: python watch.py ${{ inputs.test_mail && '--test-mail' || '' }} ${{ inputs.debug && '--debug' || '' }}
       - name: 儲存狀態
         run: |
