@@ -265,9 +265,12 @@ def main():
             lines.append(f"✅ 你的{name}應考證號出現在：{title}\n   {url}")
     notify_notices = [] if first_run else new_notices
     mis_first = sorted(notify_notices, key=lambda x: not is_mis(x[1]))
+    hit_schools = {k.split("|", 1)[0] for k in st["hits"]}
     for name, title, url in mis_first:
         tag = "【資管】" if is_mis(title) else ""
-        lines.append(f"📢 {name}新公告{tag}：{title}\n   {url}")
+        note = ("（名單裡已找到你的應考證號，見上方 ✅）" if name in hit_schools
+                else "（程式在這則公告與附件裡沒找到你的應考證號；若名單是圖片檔可能比對不到，請點進去再確認）")
+        lines.append(f"📢 {name}新公告{tag}：{title}\n   {url}\n   {note}")
 
     if first_run:
         log(f"第一次執行：記錄現有 {len(new_notices)} 則公告為基準，不寄通知。")
