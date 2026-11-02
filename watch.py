@@ -195,7 +195,12 @@ def check_notice(session, url, title, sid, show=False):
     for t, r in docs:
         txt = doc_text(r)
         if show:
-            log(f"--- {r.url} ({len(txt)} 字)\n{txt[:1500]}")
+            g = os.environ.get("SELFTEST_GREP")
+            if g:
+                for m in re.finditer(g, txt):
+                    log(f"GREP {r.url[-40:]}: ...{txt[max(0,m.start()-300):m.end()+900]}...")
+            else:
+                log(f"--- {r.url} ({len(txt)} 字)\n{txt[:1500]}")
         if id_in(txt, sid):
             hits.append((t, r.url))
     return hits
