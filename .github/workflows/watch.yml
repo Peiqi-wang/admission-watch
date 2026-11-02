@@ -1,0 +1,44 @@
+name: 甄試名單監看
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"   # 每 10 分鐘（GitHub 尖峰時可能延遲幾分鐘）
+  workflow_dispatch:
+    inputs:
+      test_mail:
+        description: "寄一封測試信"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: watch
+  cancel-in-progress: false
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: 檢查公告
+        env:
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
+          NSYSU_ID: ${{ secrets.NSYSU_ID }}
+          NCU_ID: ${{ secrets.NCU_ID }}
+        run: python watch.py ${{ inputs.test_mail && '--test-mail' || '' }}
+      - name: 儲存狀態
+        run: |
+          git config user.name "admission-watch"
+          git config user.email "admission-watch@users.noreply.github.com"
+          git add state.json
+          git diff --cached --quiet || (git commit -m "update state" && git push)
