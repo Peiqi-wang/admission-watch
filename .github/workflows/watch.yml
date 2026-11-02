@@ -1,8 +1,6 @@
-name: 甄試名單監看
+name: 甄試名單監看（手動測試用）
 
 on:
-  schedule:
-    - cron: "3-59/10 * * * *"   # 每 10 分鐘（避開整點尖峰；GitHub 偶爾延遲幾分鐘）
   workflow_dispatch:
     inputs:
       test_mail:

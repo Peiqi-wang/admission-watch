@@ -1,0 +1,63 @@
+name: 甄試名單監看（接力迴圈）
+
+# GitHub 的 schedule 不一定準時啟動，所以改用「一次執行約 5.5 小時、
+# 每 10 分鐘檢查一次，結束前自己再觸發下一輪」的接力方式。
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "7 */3 * * *"   # 備援：萬一接力斷掉，排程會重新接上
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: loop
+  cancel-in-progress: false
+
+jobs:
+  loop:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: 每 10 分鐘檢查一次（約 5.5 小時）
+        env:
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
+          NSYSU_ID: ${{ secrets.NSYSU_ID }}
+          NCU_ID: ${{ secrets.NCU_ID }}
+        run: |
+          git config user.name "admission-watch"
+          git config user.email "admission-watch@users.noreply.github.com"
+          end=$(( $(date +%s) + 330*60 ))
+          while [ $(date +%s) -lt $end ]; do
+            start=$(date +%s)
+            echo "===== $(TZ=Asia/Taipei date '+%m/%d %H:%M') 台北時間 ====="
+            git pull -q --rebase || true
+            python watch.py || echo "本次檢查發生錯誤，10 分鐘後再試"
+            git add state.json
+            if ! git diff --cached --quiet; then
+              git commit -qm "update state"
+              for t in 1 2 3; do git pull -q --rebase && git push -q && break; sleep 5; done
+            fi
+            left=$(( 600 - ($(date +%s) - start) ))
+            [ $left -gt 0 ] && sleep $left
+          done
+      - name: 接力：觸發下一輪
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          curl -sS -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/workflows/loop.yml/dispatches" \
+            -d '{"ref":"main"}'
+          echo "已觸發下一輪"
