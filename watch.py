@@ -24,6 +24,7 @@ except ImportError:  # pragma: no cover
     PdfReader = None
 
 STATE_FILE = "state.json"
+DEBUG = False
 UA = {"User-Agent": "Mozilla/5.0 (admission-watch; personal use)"}
 TIMEOUT = 25
 
@@ -44,8 +45,9 @@ SCHOOLS = {
         "id_env": "NCU_ID",
         "domains": ["ncu.edu.tw"],
         "seeds": [
-            "https://www.mis.ncu.edu.tw/",
-            "https://mis.ncu.edu.tw/",
+            "https://im.mgt.ncu.edu.tw/",
+            "https://mis.mgt.ncu.edu.tw/",
+            "https://www.mgt.ncu.edu.tw/",
             "https://admission.ncu.edu.tw/",
             "https://pdc.adm.ncu.edu.tw/",
             "https://pdc.adm.ncu.edu.tw/admission/",
@@ -156,6 +158,8 @@ def crawl_school(session, name, cfg, sid):
         for text, href in page_links(resp):
             if not in_domain(href, cfg["domains"]):
                 continue
+            if DEBUG and EXAM_WORDS.search(text):
+                log(f"    debug d{depth} {resp.url[:60]} -> {text[:70]} | {href}")
             if is_result_notice(text):
                 notices.setdefault(href, text[:120])
             elif depth < 1 and NAV_WORDS.search(text) and href not in seen:
@@ -212,6 +216,8 @@ def send_mail(subject, body):
 
 
 def main():
+    global DEBUG
+    DEBUG = "--debug" in sys.argv
     test_mail = "--test-mail" in sys.argv
     st = load_state()
     session = requests.Session()
