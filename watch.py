@@ -23,7 +23,7 @@ try:
 except ImportError:  # pragma: no cover
     PdfReader = None
 
-STATE_FILE = "state.json"
+STATE_FILE = "state.json" if os.environ.get("TARGET_YEAR", "116") == "116" else "state_sim.json"
 DEBUG = False
 UA = {"User-Agent": "Mozilla/5.0 (admission-watch; personal use)"}
 TIMEOUT = 25
@@ -34,24 +34,22 @@ SCHOOLS = {
         "domains": ["nsysu.edu.tw"],
         "seeds": [
             "https://oaa.nsysu.edu.tw/",
-            "https://oaa.nsysu.edu.tw/p/412-1003-1393.php?Lang=zh-tw",
+            "https://exam-oaa.nsysu.edu.tw/p/412-1065-2038.php?Lang=zh-tw",
             "https://exam-acad.nsysu.edu.tw/exam_netlist/netlist_main.php?ExmNo=11",
             "https://exam-acad.nsysu.edu.tw/",
             "https://www.mis.nsysu.edu.tw/",
-            "https://mis.nsysu.edu.tw/",
+            "https://exam-acad.nsysu.edu.tw/exam_netlist/chk_dpt_prt.php?str=TVRVeE1URXhOall3TURnME1qQmhZMkU9",
         ],
     },
     "中央": {
         "id_env": "NCU_ID",
         "domains": ["ncu.edu.tw"],
         "seeds": [
+            "https://im.mgt.ncu.edu.tw/enrollment",
+            "https://im.mgt.ncu.edu.tw/enrollment/MS/MSselect",
             "https://im.mgt.ncu.edu.tw/",
-            "https://mis.mgt.ncu.edu.tw/",
-            "https://www.mgt.ncu.edu.tw/",
+            "https://admission.ncu.edu.tw/p/412-1024-2359.php",
             "https://admission.ncu.edu.tw/",
-            "https://pdc.adm.ncu.edu.tw/",
-            "https://pdc.adm.ncu.edu.tw/admission/",
-            "https://www.ncu.edu.tw/",
         ],
     },
 }
@@ -59,8 +57,7 @@ SCHOOLS = {
 # 公告標題要符合的條件
 RESULT_WORDS = re.compile(r"(面試|複試|口試|名單|榜單|放榜|錄取|初審|審查結果|甄試結果)")
 EXAM_WORDS = re.compile(r"(甄試|碩士|推甄)")
-YEAR_OK = re.compile(r"116")
-YEAR_OLD = re.compile(r"11[0-5]\s*學年")
+YEAR = os.environ.get("TARGET_YEAR", "116")
 # 值得點進去繼續找的「列表頁」連結
 NAV_WORDS = re.compile(r"(最新消息|公告|招生|甄試|碩士班|入學|news|admission)", re.I)
 
@@ -103,11 +100,21 @@ def page_links(resp):
 
 
 def is_result_notice(text):
-    if not RESULT_WORDS.search(text) or not EXAM_WORDS.search(text):
+    if not RESULT_WORDS.search(text):
         return False
-    if YEAR_OLD.search(text) and not YEAR_OK.search(text):
+    has_year = YEAR in text
+    if not (EXAM_WORDS.search(text) or has_year):
         return False
-    return True
+    # 標題寫了別的學年度（例如 115 學年度）就不是這次的
+    other = [y for y in re.findall(r"(1[01]\d)\s*學年", text) if y != YEAR]
+    if other and not has_year:
+        return False
+    # 考試入學（筆試）、在職專班、博士班、轉學等不相干的排除
+    if re.search(r"(考試入學|入學考試|在職|博士|轉學|學士|學分班|EMBA)", text) and "甄試" not in text:
+        return False
+    if re.search(r"(在職|博士|轉學|學士班|學分班|EMBA)", text):
+        return False
+    return has_year or "甄試" in text
 
 
 def is_mis(text):
