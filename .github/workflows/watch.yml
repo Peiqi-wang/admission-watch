@@ -2,7 +2,7 @@ name: 甄試名單監看
 
 on:
   schedule:
-    - cron: "*/10 * * * *"   # 每 10 分鐘（GitHub 尖峰時可能延遲幾分鐘）
+    - cron: "3-59/10 * * * *"   # 每 10 分鐘（避開整點尖峰；GitHub 偶爾延遲幾分鐘）
   workflow_dispatch:
     inputs:
       test_mail:
