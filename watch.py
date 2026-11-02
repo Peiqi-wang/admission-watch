@@ -55,7 +55,7 @@ SCHOOLS = {
 }
 
 # 公告標題要符合的條件
-RESULT_WORDS = re.compile(r"(面試|複試|口試|名單|榜單|放榜|錄取|初審|審查結果|甄試結果)")
+RESULT_WORDS = re.compile(r"(面試|複試|口試|名單|榜單|放榜|錄取|初審|甄試結果|成績)")
 EXAM_WORDS = re.compile(r"(甄試|碩士|推甄)")
 YEAR = os.environ.get("TARGET_YEAR", "116")
 # 值得點進去繼續找的「列表頁」連結
@@ -112,7 +112,7 @@ def is_result_notice(text):
     # 考試入學（筆試）、在職專班、博士班、轉學等不相干的排除
     if re.search(r"(考試入學|入學考試|在職|博士|轉學|學士|學分班|EMBA)", text) and "甄試" not in text:
         return False
-    if re.search(r"(在職|博士|轉學|學士班|學分班|EMBA)", text):
+    if re.search(r"(在職|博士|轉學|學士班|學分班|EMBA|抵免|聲明書|切結書|工讀|招募|簡章|報名人數)", text):
         return False
     return has_year or "甄試" in text
 
@@ -225,6 +225,13 @@ def send_mail(subject, body):
 def main():
     global DEBUG
     DEBUG = "--debug" in sys.argv
+    dump = os.environ.get("DUMP_URL")
+    if dump:
+        r = fetch(requests.Session(), dump)
+        if r is not None:
+            for t, h in page_links(r):
+                log(f"LINK {t[:90]} | {h}")
+        return
     test_mail = "--test-mail" in sys.argv
     st = load_state()
     session = requests.Session()
