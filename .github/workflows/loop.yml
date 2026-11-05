@@ -33,6 +33,7 @@ jobs:
           MAIL_TO: ${{ secrets.MAIL_TO }}
           NSYSU_ID: ${{ secrets.NSYSU_ID }}
           NCU_ID: ${{ secrets.NCU_ID }}
+          NTUST_ID: ${{ secrets.NTUST_ID }}
         run: |
           git config user.name "admission-watch"
           git config user.email "admission-watch@users.noreply.github.com"

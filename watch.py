@@ -1,5 +1,5 @@
 """
-116 學年度碩士班甄試名單監看：中山資管、中央資管
+116 學年度碩士班甄試名單監看：中山資管、中央資管、台科資管
 - 從各校教務處／招生組／資管系的公告頁出發，找出「116 + 甄試/碩士 + 面試/複試/名單/榜單/錄取」的公告
 - 新公告 → 寄信通知
 - 打開公告（網頁、PDF）搜尋應考證號碼 → 找到就寄信通知
@@ -52,6 +52,14 @@ SCHOOLS = {
             "https://im.mgt.ncu.edu.tw/",
             "https://admission.ncu.edu.tw/p/412-1024-2359.php",
             "https://admission.ncu.edu.tw/",
+        ],
+    },
+    "台科": {
+        "id_env": "NTUST_ID",
+        "domains": ["ntust.edu.tw"],
+        "seeds": [
+            "https://www.admission.ntust.edu.tw/p/412-1052-8730.php?Lang=zh-tw",
+            "https://www.mis.ntust.edu.tw/",
         ],
     },
 }
@@ -112,9 +120,9 @@ def is_result_notice(text):
     if other and not has_year:
         return False
     # 考試入學（筆試）、在職專班、博士班、轉學等不相干的排除
-    if re.search(r"(考試入學|入學考試|在職|博士|轉學|學士|學分班|EMBA)", text) and "甄試" not in text:
+    if re.search(r"(考試入學|入學考試|在職|(?<!碩)博士|轉學|學士|學分班|EMBA)", text) and "甄試" not in text:
         return False
-    if re.search(r"(在職|博士|轉學|學士班|學分班|EMBA|抵免|聲明書|切結書|工讀|招募|簡章|報名人數|專班|特殊選才|學士|海納百川)", text):
+    if re.search(r"(在職|(?<!碩)博士|轉學|學士班|學分班|EMBA|抵免|聲明書|切結書|工讀|招募|簡章|報名人數|專班|特殊選才|學士|海納百川)", text):
         return False
     return has_year or "甄試" in text
 
@@ -139,15 +147,50 @@ def doc_text(resp):
     return BeautifulSoup(resp.text, "html.parser").get_text(" ", strip=True)
 
 
-def id_in(text, sid):
-    if not sid:
-        return False
+def parse_ids(raw):
+    """解析號碼設定，回傳 [(組別, 號碼), ...]。
+    支援單一號碼「12345」，或多組「甲組=109100170,乙組=109200136」（逗號、頓號、分號、換行皆可分隔）。"""
+    out = []
+    for part in re.split(r"[,，、;；\n]+", raw or ""):
+        part = part.strip()
+        if not part:
+            continue
+        if "=" in part or "＝" in part:
+            label, num = re.split(r"[=＝]", part, maxsplit=1)
+            label, num = label.strip(), num.strip()
+        else:
+            label, num = "", part
+        num = re.sub(r"\s+", "", num)
+        if num:
+            out.append((label, num))
+    return out
+
+
+def ids_in(text, ids):
+    """回傳在 text 裡出現的 [(組別, 號碼), ...]。"""
+    if not ids:
+        return []
     norm = re.sub(r"\s+", "", text).upper()
-    return sid.upper() in norm
+    return [(label, num) for label, num in ids if num.upper() in norm]
 
 
-def crawl_school(session, name, cfg, sid):
-    """回傳 (notices: dict url->title, hits: list of (title,url))."""
+def id_desc(label, num):
+    return f"{label} {num}" if label else num
+
+
+# 公告裡值得打開的附件：PDF，或放在附件路徑（例如 /var/file/）底下的 .html
+ATTACH_PATH = re.compile(r"/(var/file|files?|uploads?|attach\w*|downloads?)/", re.I)
+
+
+def is_attachment(href):
+    if re.search(r"\.pdf(\?|#|$)", href, re.I):
+        return True
+    path = urlparse(href).path
+    return bool(re.search(r"\.html?$", path, re.I) and ATTACH_PATH.search(path))
+
+
+def crawl_school(session, name, cfg, ids):
+    """回傳 (notices: dict url->title, hits: list of (title, url, 組別, 號碼))."""
     notices = {}
     hits = []
     seen = set()
@@ -177,18 +220,22 @@ def crawl_school(session, name, cfg, sid):
 
     # 打開候選公告（以及公告裡的附件）搜尋應考證號
     for url, title in list(notices.items())[:25]:
-        hits.extend(check_notice(session, url, title, sid))
+        hits.extend(check_notice(session, url, title, ids))
     return notices, hits
 
 
-def check_notice(session, url, title, sid, show=False):
+def check_notice(session, url, title, ids, show=False):
     hits = []
     resp = fetch(session, url)
     if resp is None:
         return hits
     docs = [(title, resp)]
+    opened = {resp.url, url}
     for text, href in page_links(resp):
-        if re.search(r"\.(pdf)(\?|$)", href, re.I) or is_result_notice(text) or "附件" in text or "下載" in text:
+        if href in opened:
+            continue
+        if is_attachment(href) or is_result_notice(text) or "附件" in text or "下載" in text:
+            opened.add(href)
             r2 = fetch(session, href)
             if r2 is not None:
                 docs.append((f"{title} / {text[:60]}", r2))
@@ -201,8 +248,8 @@ def check_notice(session, url, title, sid, show=False):
                     log(f"GREP {r.url[-40:]}: ...{txt[max(0,m.start()-300):m.end()+900]}...")
             else:
                 log(f"--- {r.url} ({len(txt)} 字)\n{txt[:1500]}")
-        if id_in(txt, sid):
-            hits.append((t, r.url))
+        for label, num in ids_in(txt, ids):
+            hits.append((t, r.url, label, num))
     return hits
 
 
@@ -244,11 +291,13 @@ def main():
     selftest = os.environ.get("SELFTEST_URL")
     if selftest:
         sid = os.environ.get("SELFTEST_ID", "")
-        hits = check_notice(requests.Session(), selftest, "自我測試名單", sid, show=not sid)
+        ids = parse_ids(sid)
+        hits = check_notice(requests.Session(), selftest, "自我測試名單", ids, show=not ids)
         log(f"自我測試：號碼 {sid or '(未提供)'} 找到 {len(hits)} 處")
-        if sid:
-            body = ("這是完整流程測試（拿中央資管去年的名單當範例）。\n\n" +
-                    ("\n".join(f"✅ 在「{t}」找到測試號碼\n   {u}" for t, u in hits) if hits else "❌ 沒找到測試號碼"))
+        if ids:
+            body = ("這是完整流程測試（拿去年的名單當範例）。\n\n" +
+                    ("\n".join(f"✅ 在「{t}」找到測試號碼 {id_desc(lb, n)}\n   {u}" for t, u, lb, n in hits)
+                     if hits else "❌ 沒找到測試號碼"))
             send_mail("🧪 名單比對測試：" + ("成功" if hits else "失敗"), body)
         return
     dump = os.environ.get("DUMP_URL")
@@ -263,31 +312,39 @@ def main():
     session = requests.Session()
     new_notices = []
     new_hits = []
+    # 每校各自建立基準：新加入的學校第一次只記錄現有公告，不當成新公告通知
+    if "initialized_schools" not in st:
+        st["initialized_schools"] = (sorted(n for n in SCHOOLS if n != "台科")
+                                     if st.get("initialized") else [])
+    baseline_schools = [n for n in SCHOOLS if n not in st["initialized_schools"]]
     for name, cfg in SCHOOLS.items():
-        sid = (os.environ.get(cfg["id_env"]) or "").strip()
-        notices, hits = crawl_school(session, name, cfg, sid)
+        ids = parse_ids(os.environ.get(cfg["id_env"]))
+        notices, hits = crawl_school(session, name, cfg, ids)
         for url, title in notices.items():
             key = f"{name}|{url}"
             if key not in st["notices"]:
                 st["notices"][key] = title
                 new_notices.append((name, title, url))
-        for title, url in hits:
-            key = f"{name}|{url}"
+        for title, url, label, num in hits:
+            # 單一號碼沿用舊格式的 key，避免已通知過的再寄一次
+            key = f"{name}|{label}={num}|{url}" if label else f"{name}|{url}"
             if key not in st["hits"]:
                 st["hits"].append(key)
-                new_hits.append((name, title, url))
+                new_hits.append((name, title, url, label, num))
 
     first_run = not st.get("initialized")
     st["initialized"] = True
+    st["initialized_schools"] = sorted(set(st["initialized_schools"]) | set(SCHOOLS))
     st["last_run"] = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()) + " UTC"
     save_state(st)
 
     # 第一次執行只建立基準（舊公告不通知），但找到應考證號一定通知
     lines = []
     if new_hits:
-        for name, title, url in new_hits:
-            lines.append(f"✅ 你的{name}應考證號出現在：{title}\n   {url}")
-    notify_notices = [] if first_run else new_notices
+        for name, title, url, label, num in new_hits:
+            who = f"{name}{label}" if label else name
+            lines.append(f"✅ 你的{who}應考證號 {num} 出現在：{title}\n   {url}")
+    notify_notices = [] if first_run else [x for x in new_notices if x[0] not in baseline_schools]
     mis_first = sorted(notify_notices, key=lambda x: not is_mis(x[1]))
     hit_schools = {k.split("|", 1)[0] for k in st["hits"]}
     for name, title, url in mis_first:
@@ -296,14 +353,15 @@ def main():
                 else "（程式在這則公告與附件裡沒找到你的應考證號；若名單是圖片檔可能比對不到，請點進去再確認）")
         lines.append(f"📢 {name}新公告{tag}：{title}\n   {url}\n   {note}")
 
-    if first_run:
-        log(f"第一次執行：記錄現有 {len(new_notices)} 則公告為基準，不寄通知。")
-        for name, title, url in new_notices:
+    baseline = new_notices if first_run else [x for x in new_notices if x[0] in baseline_schools]
+    if baseline:
+        log(f"第一次檢查 {'、'.join(sorted({x[0] for x in baseline}))}：記錄現有 {len(baseline)} 則公告為基準，不寄通知。")
+        for name, title, url in baseline:
             log(f"  - {name} | {title} | {url}")
 
     if lines:
         if new_hits:
-            subject = "✅ 甄試名單有你！" + "、".join(sorted({n for n, _, _ in new_hits}))
+            subject = "✅ 甄試名單有你！" + "、".join(sorted({n + (lb or "") for n, _, _, lb, _ in new_hits}))
         else:
             subject = "📢 甄試新公告：" + "、".join(sorted({n for n, _, _ in notify_notices}))
         body = "\n\n".join(lines) + "\n\n（請點連結自行再確認一次。名單若是掃描圖檔，程式可能比對不到號碼。）"
