@@ -2,7 +2,9 @@
  "hits": [
   "中央|https://im.mgt.ncu.edu.tw/download/newpost/116%E5%AD%B8%E5%B9%B4%E5%BA%A6%E7%A2%A9%E5%A3%AB%E7%8F%AD%E7%94%84%E8%A9%A6%E8%A4%87%E8%A9%A6%E6%99%82%E7%A8%8B%E8%A1%A8%E5%8F%8A%E5%88%86%E7%B5%84%E8%A1%A8.pdf",
   "中央|https://im.mgt.ncu.edu.tw/enrollment/9603/post",
-  "中央|https://im.mgt.ncu.edu.tw/download/newpost/116%E5%AD%B8%E5%B9%B4%E5%BA%A6%E7%A2%A9%E5%A3%AB%E7%8F%AD%E7%94%84%E8%A9%A6%E5%BE%97%E5%8F%83%E5%8A%A0%E8%A4%87%E8%A9%A6%E5%90%8D%E5%96%AE.pdf"
+  "中央|https://im.mgt.ncu.edu.tw/download/newpost/116%E5%AD%B8%E5%B9%B4%E5%BA%A6%E7%A2%A9%E5%A3%AB%E7%8F%AD%E7%94%84%E8%A9%A6%E5%BE%97%E5%8F%83%E5%8A%A0%E8%A4%87%E8%A9%A6%E5%90%8D%E5%96%AE.pdf",
+  "台科|乙組=109200136|https://www.admission.ntust.edu.tw/var/file/52/1052/img/2673/763330195.html",
+  "台科|乙組=109200136|https://www.admission.ntust.edu.tw/var/file/52/1052/img/2673/890515583.html"
  ],
  "initialized": true,
  "initialized_schools": [
@@ -10,7 +12,7 @@
   "中山",
   "台科"
  ],
- "last_run": "2026-11-05 05:16:29 UTC",
+ "last_run": "2026-11-05 05:26:54 UTC",
  "notices": {
   "中央|https://im.mgt.ncu.edu.tw/enrollment/9603/post": "【資訊管理學系複試公告】國立中央大學116學年度研究所甄試招生(碩士班)",
   "中山|https://oaa.nsysu.edu.tw/p/406-1003-382574,r867.php?Lang=zh-tw": "116學年度《碩士班甄試入學》「初審特優逕行錄取」及「通過初審參加複試」榜單 116學年度《碩士班甄試入學》「初審特優逕行錄取」及「通過初審參加複試」榜單(另開新視窗)",
