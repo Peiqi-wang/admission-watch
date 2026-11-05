@@ -1,5 +1,5 @@
 """
-116 學年度碩士班甄試名單監看：中山資管、中央資管、台科資管
+116 學年度碩士班甄試名單監看：中山資管、中央資管、台科資管（cs.ntust.edu.tw）
 - 從各校教務處／招生組／資管系的公告頁出發，找出「116 + 甄試/碩士 + 面試/複試/名單/榜單/錄取」的公告
 - 新公告 → 寄信通知
 - 打開公告（網頁、PDF）搜尋應考證號碼 → 找到就寄信通知
@@ -57,10 +57,19 @@ SCHOOLS = {
     "台科": {
         "id_env": "NTUST_ID",
         "domains": ["ntust.edu.tw"],
+        # 台科資管系的網域是 cs.ntust.edu.tw（不是 mis）
         "seeds": [
+            # 資管系：系所公告（前兩頁）、首頁、碩士班介紹
+            "https://www.cs.ntust.edu.tw/p/403-1102-1989.php?Lang=zh-tw",
+            "https://www.cs.ntust.edu.tw/p/403-1102-1989-2.php?Lang=zh-tw",
+            "https://www.cs.ntust.edu.tw/",
+            "https://www.cs.ntust.edu.tw/p/412-1102-10836.php?Lang=zh-tw",
+            # 招生組：最新消息、碩博班甄試入學專區、招生資訊首頁
             "https://www.admission.ntust.edu.tw/p/412-1052-8730.php?Lang=zh-tw",
-            "https://www.mis.ntust.edu.tw/",
+            "https://www.admission.ntust.edu.tw/p/412-1052-8735.php?Lang=zh-tw",
+            "https://www.admission.ntust.edu.tw/home.php?Lang=zh-tw",
         ],
+        "max_pages": 60,
     },
 }
 
@@ -195,7 +204,7 @@ def crawl_school(session, name, cfg, ids):
     hits = []
     seen = set()
     queue = [(u, 0) for u in cfg["seeds"]]
-    max_pages = 40
+    max_pages = cfg.get("max_pages", 40)
     ok_seeds = 0
     while queue and len(seen) < max_pages:
         url, depth = queue.pop(0)
