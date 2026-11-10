@@ -119,14 +119,14 @@ def is_result_notice(text):
     has_year = YEAR in text
     if not (EXAM_WORDS.search(text) or has_year):
         return False
-    # 標題寫了別的學年度（例如 115 學年度）就不是這次的
-    other = [y for y in re.findall(r"(1[01]\d)\s*學年", text) if y != YEAR]
+    # 標題寫了別的年度（例如「115學年度」「114碩士班」）就不是這次的
+    other = [y for y in re.findall(r"(?<!\d)(1[01]\d)(?!\d)", text) if y != YEAR]
     if other and not has_year:
         return False
     # 考試入學（筆試）、在職專班、博士班、轉學等不相干的排除
     if re.search(r"(考試入學|入學考試|在職|(?<!碩)博士|轉學|學士|學分班|EMBA)", text) and "甄試" not in text:
         return False
-    if re.search(r"(在職|(?<!碩)博士|轉學|學士班|學分班|EMBA|抵免|聲明書|切結書|工讀|招募|簡章|報名人數|專班|特殊選才|學士|海納百川)", text):
+    if re.search(r"(在職|(?<!碩)博士|博甄|博班|轉學|學士班|學分班|EMBA|抵免|聲明書|切結書|工讀|招募|簡章|報名人數|專班|特殊選才|學士|海納百川)", text):
         return False
     return has_year or "甄試" in text
 
@@ -185,8 +185,14 @@ def ids_in(text, ids):
     """回傳在 text 裡出現的 [(組別, 號碼), ...]。"""
     if not ids:
         return []
-    norm = re.sub(r"\s+", "", text).upper()
-    return [(label, num) for label, num in ids if num.upper() in norm]
+    up = text.upper()
+    out = []
+    for label, num in ids:
+        # 號碼前後不能接著其他英數字（避免比到更長號碼的一部分）；PDF 抽出來的字中間可能夾空白
+        pat = r"(?<![0-9A-Z])" + r"\s*".join(map(re.escape, num.upper())) + r"(?![0-9A-Z])"
+        if re.search(pat, up):
+            out.append((label, num))
+    return out
 
 
 def id_desc(label, num):
