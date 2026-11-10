@@ -1,5 +1,5 @@
 """
-116 學年度碩士班甄試名單監看：中山資管、中央資管、台科資管（cs.ntust.edu.tw）
+116 學年度碩士班甄試名單監看：中央資管（面試後錄取名單／第二梯次）、政大資管面試名單、政大資科面試名單
 - 從各校教務處／招生組／資管系的公告頁出發，找出「116 + 甄試/碩士 + 面試/複試/名單/榜單/錄取」的公告
 - 新公告 → 寄信通知
 - 打開公告（網頁、PDF）搜尋應考證號碼 → 找到就寄信通知
@@ -29,23 +29,10 @@ UA = {"User-Agent": "Mozilla/5.0 (admission-watch; personal use)"}
 TIMEOUT = 25
 
 SCHOOLS = {
-    "中山": {
-        "id_env": "NSYSU_ID",
-        "domains": ["nsysu.edu.tw"],
-        "seeds": [
-            "https://oaa.nsysu.edu.tw/p/403-1003-867-1.php?Lang=zh-tw",
-            "https://oaa.nsysu.edu.tw/p/403-1003-878.php?Lang=zh-tw",
-            "https://oaa.nsysu.edu.tw/",
-            "https://exam-oaa.nsysu.edu.tw/p/412-1065-2038.php?Lang=zh-tw",
-            "https://exam-acad.nsysu.edu.tw/exam_netlist/netlist_main.php?ExmNo=11",
-            "https://exam-acad.nsysu.edu.tw/",
-            "https://www.mis.nsysu.edu.tw/",
-            "https://exam-acad.nsysu.edu.tw/exam_netlist/chk_dpt_prt.php?str=TVRVeE1URXhOall3TURnME1qQmhZMkU9",
-        ],
-    },
-    "中央": {
+    # 中央資管：只看「面試（複試）後」的錄取名單（第二梯次），第一梯次與複試名單不再通知
+    "中央資管": {
         "id_env": "NCU_ID",
-        "domains": ["ncu.edu.tw"],
+        "domains": ["im.mgt.ncu.edu.tw", "admission.ncu.edu.tw", "iacs.ncu.edu.tw"],
         "seeds": [
             "https://im.mgt.ncu.edu.tw/enrollment",
             "https://im.mgt.ncu.edu.tw/enrollment/MS/MSselect",
@@ -53,23 +40,31 @@ SCHOOLS = {
             "https://admission.ncu.edu.tw/p/412-1024-2359.php",
             "https://admission.ncu.edu.tw/",
         ],
+        "require": r"(錄取|正取|備取|榜單|放榜)",
+        "exclude": r"(第一梯次|第1梯次|僅初試)",
     },
-    "台科": {
-        "id_env": "NTUST_ID",
-        "domains": ["ntust.edu.tw"],
-        # 台科資管系的網域是 cs.ntust.edu.tw（不是 mis）
+    # 政大資管：碩士班甄試面試名單
+    "政大資管": {
+        "id_env": "NCCU_MIS_ID",
+        "domains": ["mis2.nccu.edu.tw", "mis.nccu.edu.tw"],
         "seeds": [
-            # 資管系：系所公告（前兩頁）、首頁、碩士班介紹
-            "https://www.cs.ntust.edu.tw/p/403-1102-1989.php?Lang=zh-tw",
-            "https://www.cs.ntust.edu.tw/p/403-1102-1989-2.php?Lang=zh-tw",
-            "https://www.cs.ntust.edu.tw/",
-            "https://www.cs.ntust.edu.tw/p/412-1102-10836.php?Lang=zh-tw",
-            # 招生組：最新消息、碩博班甄試入學專區、招生資訊首頁
-            "https://www.admission.ntust.edu.tw/p/412-1052-8730.php?Lang=zh-tw",
-            "https://www.admission.ntust.edu.tw/p/412-1052-8735.php?Lang=zh-tw",
-            "https://www.admission.ntust.edu.tw/home.php?Lang=zh-tw",
+            "https://mis2.nccu.edu.tw/zh_tw/Admission/admission2",
+            "https://mis2.nccu.edu.tw/zh_tw/Admission",
+            "https://mis2.nccu.edu.tw/zh_tw",
+            "https://mis.nccu.edu.tw/",
         ],
-        "max_pages": 60,
+        "require": r"(面試|口試|複試)",
+    },
+    # 政大資科：碩士班甄試面試名單
+    "政大資科": {
+        "id_env": "NCCU_CS_ID",
+        "domains": ["cs.nccu.edu.tw"],
+        "seeds": [
+            "https://www.cs.nccu.edu.tw/",
+            "https://www.cs.nccu.edu.tw/news",
+            "https://www.cs.nccu.edu.tw/zh_tw",
+        ],
+        "require": r"(面試|口試|複試)",
     },
 }
 
@@ -134,6 +129,17 @@ def is_result_notice(text):
     if re.search(r"(在職|(?<!碩)博士|轉學|學士班|學分班|EMBA|抵免|聲明書|切結書|工讀|招募|簡章|報名人數|專班|特殊選才|學士|海納百川)", text):
         return False
     return has_year or "甄試" in text
+
+
+def school_wants(text, cfg):
+    """學校自己的額外條件（例如中央只要錄取名單、政大只要面試名單）。"""
+    if not is_result_notice(text):
+        return False
+    if cfg.get("require") and not re.search(cfg["require"], text):
+        return False
+    if cfg.get("exclude") and re.search(cfg["exclude"], text):
+        return False
+    return True
 
 
 def is_mis(text):
@@ -221,7 +227,7 @@ def crawl_school(session, name, cfg, ids):
                 continue
             if DEBUG and EXAM_WORDS.search(text):
                 log(f"    debug d{depth} {resp.url[:60]} -> {text[:70]} | {href}")
-            if is_result_notice(text):
+            if school_wants(text, cfg):
                 notices.setdefault(href, text[:120])
             elif depth < 1 and NAV_WORDS.search(text) and href not in seen:
                 queue.append((href, depth + 1))
@@ -321,11 +327,9 @@ def main():
     session = requests.Session()
     new_notices = []
     new_hits = []
-    # 每校各自建立基準：新加入的學校第一次只記錄現有公告，不當成新公告通知
-    if "initialized_schools" not in st:
-        st["initialized_schools"] = (sorted(n for n in SCHOOLS if n != "台科")
-                                     if st.get("initialized") else [])
-    baseline_schools = [n for n in SCHOOLS if n not in st["initialized_schools"]]
+    # 新加入的學校不建立基準：名單可能已經公告了，現有符合條件的公告也直接通知
+    st.setdefault("initialized_schools", [])
+    baseline_schools = []
     for name, cfg in SCHOOLS.items():
         ids = parse_ids(os.environ.get(cfg["id_env"]))
         notices, hits = crawl_school(session, name, cfg, ids)

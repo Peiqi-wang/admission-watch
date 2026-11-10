@@ -51,9 +51,9 @@ jobs:
           GMAIL_USER: ${{ secrets.GMAIL_USER }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
           MAIL_TO: ${{ secrets.MAIL_TO }}
-          NSYSU_ID: ${{ secrets.NSYSU_ID }}
           NCU_ID: ${{ secrets.NCU_ID }}
-          NTUST_ID: ${{ secrets.NTUST_ID }}
+          NCCU_MIS_ID: ${{ secrets.NCCU_MIS_ID }}
+          NCCU_CS_ID: ${{ secrets.NCCU_CS_ID }}
           TARGET_YEAR: ${{ inputs.year || '116' }}
           DUMP_URL: ${{ inputs.dump_url }}
           SELFTEST_URL: ${{ inputs.selftest_url }}
