@@ -52,7 +52,6 @@ jobs:
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
           MAIL_TO: ${{ secrets.MAIL_TO }}
           NCU_ID: ${{ secrets.NCU_ID }}
-          NCCU_MIS_ID: ${{ secrets.NCCU_MIS_ID }}
           NCCU_CS_ID: ${{ secrets.NCCU_CS_ID }}
           TARGET_YEAR: ${{ inputs.year || '116' }}
           DUMP_URL: ${{ inputs.dump_url }}
