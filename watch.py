@@ -1,5 +1,5 @@
 """
-116 學年度碩士班甄試名單監看：中央資管（面試後錄取名單／第二梯次）、政大資科面試名單
+116 學年度碩士班甄試名單監看：中央資管（第二梯次錄取名單）、政大資科面試名單、雲科資管、台科資管乙組
 - 從各校教務處／招生組／資管系的公告頁出發，找出「116 + 甄試/碩士 + 面試/複試/名單/榜單/錄取」的公告
 - 新公告 → 寄信通知
 - 打開公告（網頁、PDF）搜尋應考證號碼 → 找到就寄信通知
@@ -13,7 +13,7 @@ import smtplib
 import sys
 import time
 from email.mime.text import MIMEText
-from urllib.parse import urljoin, urlparse
+from urllib.parse import unquote, urljoin, urlparse
 
 import requests
 from bs4 import BeautifulSoup
@@ -59,6 +59,19 @@ SCHOOLS = {
         "require": r"(面試|口試|複試)",
         # 另外：系網只要出現新的碩士班甄試相關連結（面試時間表、錄取名單等）就寄信
         "watch_all": r"(甄試|推甄|碩士班|面試|口試|錄取|榜單|放榜)",
+    },
+    # 雲科資管：碩士班甄試（面試 11/14 已過，主要等錄取名單）。號碼放 YUNTECH_ID
+    "雲科資管": {
+        "id_env": "YUNTECH_ID",
+        "domains": ["mis.yuntech.edu.tw"],
+        "seeds": [
+            "https://www.mis.yuntech.edu.tw/announcements?category=department",
+            "https://www.mis.yuntech.edu.tw/announcements",
+            "https://www.mis.yuntech.edu.tw/",
+            "https://www.mis.yuntech.edu.tw/pages/970-%E7%A2%A9%E5%A3%AB%E7%8F%AD",
+        ],
+        "require": r"(錄取|正取|備取|榜單|放榜)",
+        "watch_all": r"(甄試|推甄|碩士班|錄取|榜單|放榜|正取|備取)",
     },
     # 台科資管（乙組）：名稱沿用「台科」，才能接上之前的紀錄（已通知過的口試名單不會再寄）
     # 號碼放 NTUST_ID，例如「乙組=109200136」
@@ -123,7 +136,13 @@ def page_links(resp):
         title = a.get("title") or ""
         href = urljoin(resp.url, a["href"])
         if href.startswith("http"):
-            out.append((f"{text} {title}".strip(), href))
+            label = f"{text} {title}".strip()
+            # 有些網站（例如雲科）連結沒有文字，標題只寫在網址最後一段
+            if not re.search(r"[\u4e00-\u9fff]", label):
+                slug = unquote(urlparse(href).path.rstrip("/").rsplit("/", 1)[-1])
+                if re.search(r"[\u4e00-\u9fff]", slug):
+                    label = f"{label} {slug}".strip()
+            out.append((label, href))
     return out
 
 
