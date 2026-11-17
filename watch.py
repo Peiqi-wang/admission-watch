@@ -48,9 +48,11 @@ SCHOOLS = {
         "id_env": "NCCU_CS_ID",
         "domains": ["cs.nccu.edu.tw"],
         "seeds": [
-            "https://www.cs.nccu.edu.tw/",
-            "https://www.cs.nccu.edu.tw/news",
-            "https://www.cs.nccu.edu.tw/zh_tw",
+            # 招生資訊 → 碩士班（面試名單公告在這裡）、公告事項、首頁
+            "https://www.cs.nccu.edu.tw/web/enrollment/enrollment.jsp?dm_no=DM1555054672218",
+            "https://www.cs.nccu.edu.tw/web/news/news.jsp?lang=tw",
+            "https://www.cs.nccu.edu.tw/web/enrollment/enrollment.jsp?lang=tw",
+            "https://www.cs.nccu.edu.tw/web/index/index.jsp",
         ],
         "require": r"(面試|口試|複試)",
     },
