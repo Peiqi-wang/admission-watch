@@ -1,5 +1,5 @@
 """
-116 學年度碩士班甄試名單監看：中央資管（面試後錄取名單／第二梯次）、政大資管面試名單、政大資科面試名單
+116 學年度碩士班甄試名單監看：中央資管（面試後錄取名單／第二梯次）、政大資科面試名單
 - 從各校教務處／招生組／資管系的公告頁出發，找出「116 + 甄試/碩士 + 面試/複試/名單/榜單/錄取」的公告
 - 新公告 → 寄信通知
 - 打開公告（網頁、PDF）搜尋應考證號碼 → 找到就寄信通知
@@ -42,18 +42,6 @@ SCHOOLS = {
         ],
         "require": r"(錄取|正取|備取|榜單|放榜)",
         "exclude": r"(第一梯次|第1梯次|僅初試)",
-    },
-    # 政大資管：碩士班甄試面試名單
-    "政大資管": {
-        "id_env": "NCCU_MIS_ID",
-        "domains": ["mis2.nccu.edu.tw", "mis.nccu.edu.tw"],
-        "seeds": [
-            "https://mis2.nccu.edu.tw/zh_tw/Admission/admission2",
-            "https://mis2.nccu.edu.tw/zh_tw/Admission",
-            "https://mis2.nccu.edu.tw/zh_tw",
-            "https://mis.nccu.edu.tw/",
-        ],
-        "require": r"(面試|口試|複試)",
     },
     # 政大資科：碩士班甄試面試名單
     "政大資科": {
