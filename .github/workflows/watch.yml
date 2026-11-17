@@ -53,6 +53,8 @@ jobs:
           MAIL_TO: ${{ secrets.MAIL_TO }}
           NCU_ID: ${{ secrets.NCU_ID }}
           NCCU_CS_ID: ${{ secrets.NCCU_CS_ID }}
+          NTUST_ID: ${{ secrets.NTUST_ID }}
+          YUNTECH_ID: ${{ secrets.YUNTECH_ID }}
           TARGET_YEAR: ${{ inputs.year || '116' }}
           DUMP_URL: ${{ inputs.dump_url }}
           SELFTEST_URL: ${{ inputs.selftest_url }}

@@ -60,6 +60,26 @@ SCHOOLS = {
         # 另外：系網只要出現新的碩士班甄試相關連結（面試時間表、錄取名單等）就寄信
         "watch_all": r"(甄試|推甄|碩士班|面試|口試|錄取|榜單|放榜)",
     },
+    # 台科資管（乙組）：名稱沿用「台科」，才能接上之前的紀錄（已通知過的口試名單不會再寄）
+    # 號碼放 NTUST_ID，例如「乙組=109200136」
+    "台科": {
+        "id_env": "NTUST_ID",
+        "domains": ["cs.ntust.edu.tw", "admission.ntust.edu.tw"],
+        # 台科資管系的網域是 cs.ntust.edu.tw（不是 mis）
+        "seeds": [
+            # 資管系：系所公告（前兩頁）、首頁、碩士班介紹
+            "https://www.cs.ntust.edu.tw/p/403-1102-1989.php?Lang=zh-tw",
+            "https://www.cs.ntust.edu.tw/p/403-1102-1989-2.php?Lang=zh-tw",
+            "https://www.cs.ntust.edu.tw/",
+            "https://www.cs.ntust.edu.tw/p/412-1102-10836.php?Lang=zh-tw",
+            # 招生組：最新消息、碩博班甄試入學專區、招生資訊首頁
+            "https://www.admission.ntust.edu.tw/p/412-1052-8730.php?Lang=zh-tw",
+            "https://www.admission.ntust.edu.tw/p/412-1052-8735.php?Lang=zh-tw",
+            "https://www.admission.ntust.edu.tw/home.php?Lang=zh-tw",
+        ],
+        "max_pages": 60,
+        "watch_all": r"(甄試|推甄|碩士班|錄取|榜單|放榜|正取|備取)",
+    },
 }
 
 # 公告標題要符合的條件
