@@ -57,6 +57,8 @@ SCHOOLS = {
             "https://www.cs.nccu.edu.tw/web/index/index.jsp",
         ],
         "require": r"(面試|口試|複試)",
+        # 另外：系網只要出現新的碩士班甄試相關連結（面試時間表、錄取名單等）就寄信
+        "watch_all": r"(甄試|推甄|碩士班|面試|口試|錄取|榜單|放榜)",
     },
 }
 
@@ -133,7 +135,7 @@ def is_new_info(text, cfg):
         return False
     if re.search(r"(在職|(?<!碩)博士|博甄|博班|轉學|學士|學分班|EMBA|專班)", text):
         return False
-    return YEAR in text or "甄試" in text
+    return YEAR in text or bool(re.search(r"(甄試|面試|口試)", text))
 
 
 def school_wants(text, cfg):
