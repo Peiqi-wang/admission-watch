@@ -42,6 +42,8 @@ SCHOOLS = {
         ],
         "require": r"(錄取|正取|備取|榜單|放榜)",
         "exclude": r"(第一梯次|第1梯次|僅初試)",
+        # 另外：資管系／招生組網頁只要出現新的甄試相關連結就寄信（不限錄取名單）
+        "watch_all": r"(甄試|推甄|碩士班|錄取|榜單|放榜)",
     },
     # 政大資科：碩士班甄試面試名單
     "政大資科": {
@@ -119,6 +121,19 @@ def is_result_notice(text):
     if re.search(r"(在職|(?<!碩)博士|博甄|博班|轉學|學士班|學分班|EMBA|抵免|聲明書|切結書|工讀|招募|簡章|報名人數|專班|特殊選才|學士|海納百川)", text):
         return False
     return has_year or "甄試" in text
+
+
+def is_new_info(text, cfg):
+    """寬鬆條件：網頁上出現的甄試相關連結（不是別的學年度、不是博士班／在職等）。"""
+    pat = cfg.get("watch_all")
+    if not pat or not re.search(pat, text):
+        return False
+    other = [y for y in re.findall(r"(?<!\d)(1[01]\d)(?!\d)", text) if y != YEAR]
+    if other and YEAR not in text:
+        return False
+    if re.search(r"(在職|(?<!碩)博士|博甄|博班|轉學|學士|學分班|EMBA|專班)", text):
+        return False
+    return YEAR in text or "甄試" in text
 
 
 def school_wants(text, cfg):
@@ -203,6 +218,7 @@ def is_attachment(href):
 def crawl_school(session, name, cfg, ids):
     """回傳 (notices: dict url->title, hits: list of (title, url, 組別, 號碼))."""
     notices = {}
+    infos = {}
     hits = []
     seen = set()
     queue = [(u, 0) for u in cfg["seeds"]]
@@ -223,16 +239,19 @@ def crawl_school(session, name, cfg, ids):
                 continue
             if DEBUG and EXAM_WORDS.search(text):
                 log(f"    debug d{depth} {resp.url[:60]} -> {text[:70]} | {href}")
-            if school_wants(text, cfg):
+            wanted = school_wants(text, cfg)
+            if wanted:
                 notices.setdefault(href, text[:120])
-            elif depth < 1 and NAV_WORDS.search(text) and href not in seen:
+            elif is_new_info(text, cfg):
+                infos.setdefault(href, text[:120])
+            if not wanted and depth < 1 and NAV_WORDS.search(text) and href not in seen:
                 queue.append((href, depth + 1))
     log(f"[{name}] 可連線起始頁 {ok_seeds}/{len(cfg['seeds'])}，掃描 {len(seen)} 頁，找到候選公告 {len(notices)} 則")
 
     # 打開候選公告（以及公告裡的附件）搜尋應考證號
     for url, title in list(notices.items())[:25]:
         hits.extend(check_notice(session, url, title, ids))
-    return notices, hits
+    return notices, hits, infos
 
 
 def check_notice(session, url, title, ids, show=False):
@@ -323,12 +342,26 @@ def main():
     session = requests.Session()
     new_notices = []
     new_hits = []
+    new_infos = []
     # 新加入的學校不建立基準：名單可能已經公告了，現有符合條件的公告也直接通知
     st.setdefault("initialized_schools", [])
     baseline_schools = []
     for name, cfg in SCHOOLS.items():
         ids = parse_ids(os.environ.get(cfg["id_env"]))
-        notices, hits = crawl_school(session, name, cfg, ids)
+        notices, hits, infos = crawl_school(session, name, cfg, ids)
+        # 寬鬆監看：新出現的甄試相關連結。該校第一次只記錄現有的，不寄信
+        seen_info = st.setdefault("infos", {})
+        info_init = st.setdefault("info_initialized", [])
+        for url, title in infos.items():
+            key = f"{name}|{url}"
+            if key in seen_info or key in st["notices"]:
+                continue
+            seen_info[key] = title
+            if name in info_init:
+                new_infos.append((name, title, url))
+        if infos and name not in info_init:
+            info_init.append(name)
+            log(f"[{name}] 第一次記錄現有 {len(infos)} 則甄試相關連結為基準，不寄通知。")
         for url, title in notices.items():
             key = f"{name}|{url}"
             if key not in st["notices"]:
@@ -362,6 +395,9 @@ def main():
                 else "（程式在這則公告與附件裡沒找到你的應考證號；若名單是圖片檔可能比對不到，請點進去再確認）")
         lines.append(f"📢 {name}新公告{tag}：{title}\n   {url}\n   {note}")
 
+    for name, title, url in new_infos:
+        lines.append(f"🆕 {name}網頁有新的甄試資訊：{title}\n   {url}")
+
     baseline = new_notices if first_run else [x for x in new_notices if x[0] in baseline_schools]
     if baseline:
         log(f"第一次檢查 {'、'.join(sorted({x[0] for x in baseline}))}：記錄現有 {len(baseline)} 則公告為基準，不寄通知。")
@@ -371,8 +407,10 @@ def main():
     if lines:
         if new_hits:
             subject = "✅ 甄試名單有你！" + "、".join(sorted({n + (lb or "") for n, _, _, lb, _ in new_hits}))
-        else:
+        elif notify_notices:
             subject = "📢 甄試新公告：" + "、".join(sorted({n for n, _, _ in notify_notices}))
+        else:
+            subject = "🆕 甄試網頁有新資訊：" + "、".join(sorted({n for n, _, _ in new_infos}))
         body = "\n\n".join(lines) + "\n\n（請點連結自行再確認一次。名單若是掃描圖檔，程式可能比對不到號碼。）"
         send_mail(subject, body)
     elif test_mail:
