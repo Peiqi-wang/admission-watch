@@ -5,7 +5,8 @@
   "中央|https://im.mgt.ncu.edu.tw/download/newpost/116%E5%AD%B8%E5%B9%B4%E5%BA%A6%E7%A2%A9%E5%A3%AB%E7%8F%AD%E7%94%84%E8%A9%A6%E5%BE%97%E5%8F%83%E5%8A%A0%E8%A4%87%E8%A9%A6%E5%90%8D%E5%96%AE.pdf",
   "台科|乙組=109200136|https://www.admission.ntust.edu.tw/var/file/52/1052/img/2673/763330195.html",
   "台科|乙組=109200136|https://www.admission.ntust.edu.tw/var/file/52/1052/img/2673/890515583.html",
-  "政大資管|https://mis2.nccu.edu.tw/xhr/announcements/file/67369bd9311fc8b9d6403339/%E9%99%84%E4%BB%B6%E4%B8%80_114%E7%A2%A9%E5%A3%AB%E7%8F%AD%E7%94%84%E8%A9%A6%E9%9D%A2%E8%A9%A6%E5%90%8D%E5%96%AE_%E7%B3%BB%E7%B6%B2%E5%85%AC%E5%91%8A%E7%89%88_.pdf"
+  "政大資管|https://mis2.nccu.edu.tw/xhr/announcements/file/67369bd9311fc8b9d6403339/%E9%99%84%E4%BB%B6%E4%B8%80_114%E7%A2%A9%E5%A3%AB%E7%8F%AD%E7%94%84%E8%A9%A6%E9%9D%A2%E8%A9%A6%E5%90%8D%E5%96%AE_%E7%B3%BB%E7%B6%B2%E5%85%AC%E5%91%8A%E7%89%88_.pdf",
+  "政大資科|https://www.cs.nccu.edu.tw/uploads/file/tw/1168611-interviewlist.pdf"
  ],
  "info_initialized": [
   "中央資管",
@@ -15,10 +16,15 @@
  ],
  "infos": {
   "中央資管|https://admission.ncu.edu.tw/p/406-1024-10215,r598.php": "116學年度碩士班甄試入學招生簡章 原頁面開啟",
+  "中央資管|https://admission.ncu.edu.tw/p/406-1024-10215,r598.php?Lang=zh-tw": "116學年度碩士班甄試入學招生簡章 原頁面開啟",
   "中央資管|https://admission.ncu.edu.tw/p/406-1024-13865,r598.php": "116學年度碩士班考試入學招生簡章 原頁面開啟",
+  "中央資管|https://admission.ncu.edu.tw/p/406-1024-13865,r598.php?Lang=zh-tw": "116學年度碩士班考試入學招生簡章 原頁面開啟",
   "中央資管|https://admission.ncu.edu.tw/p/406-1024-14019,r598.php": "116學年度碩士班甄試入學第一梯次錄取名單(僅初試直接錄取) 原頁面開啟",
+  "中央資管|https://admission.ncu.edu.tw/p/406-1024-14019,r598.php?Lang=zh-tw": "116學年度碩士班甄試入學第一梯次錄取名單(僅初試直接錄取) 原頁面開啟",
   "中央資管|https://admission.ncu.edu.tw/p/406-1024-14057,r598.php": "台灣聯合大學系統116學年度碩士班考試招生簡章 原頁面開啟",
+  "中央資管|https://admission.ncu.edu.tw/p/406-1024-14057,r598.php?Lang=zh-tw": "台灣聯合大學系統116學年度碩士班考試招生簡章 原頁面開啟",
   "中央資管|https://admission.ncu.edu.tw/p/406-1024-14230,r598.php": "116學年度碩士班甄試報名人數統計表 原頁面開啟",
+  "中央資管|https://admission.ncu.edu.tw/p/406-1024-14230,r598.php?Lang=zh-tw": "116學年度碩士班甄試報名人數統計表 原頁面開啟",
   "中央資管|https://admission.ncu.edu.tw/p/412-1024-2356.php": "身心障礙甄試 原頁面開啟",
   "中央資管|https://admission.ncu.edu.tw/p/412-1024-2359.php": "碩士班甄試 原頁面開啟",
   "中央資管|https://im.mgt.ncu.edu.tw/download/newpost/116學年度碩士班甄試得參加複試名單.pdf": "116學年度碩士班甄試得參加複試名單.pdf 下載附件 116學年度碩士班甄試得參加複試名單.pdf（PDF）",
@@ -39,13 +45,19 @@
   "台科|https://www.admission.ntust.edu.tw/var/file/52/1052/img/2673/361964824.pdf": "碩博士班甄試招生簡章",
   "台科|https://www.admission.ntust.edu.tw/var/file/52/1052/img/2674/761850122.html": "碩士班招生口試時間地點資料表",
   "台科|https://www.admission.ntust.edu.tw/var/file/52/1052/img/876390610.pdf": "碩博士班甄試招生簡章",
+  "政大資科|https://www.cs.nccu.edu.tw/uploads/file/tw/1168612-timetable.pdf": "【請務必閱讀】8612考生甄試時間表",
   "政大資科|https://www.cs.nccu.edu.tw/web/enrollment/enrollment_in.jsp?dm_no=DM1555054672218&np_no=NP1604635320199": "1 16學年資訊工程學系碩士班甄試 跨領域組(8612)筆試公告",
   "政大資科|https://www.cs.nccu.edu.tw/web/enrollment/enrollment_in.jsp?dm_no=DM1555054672218&np_no=NP1794189998555": "116學年資訊工程學系碩士班甄試 跨領域組(8612 )11月12日筆試公告",
+  "政大資科|https://www.cs.nccu.edu.tw/web/enrollment/enrollment_in.jsp?dm_no=DM1555054672218&np_no=NP1794977526036": "【公告】116學年度碩士班【8612-跨領域組】甄試時間表",
   "政大資科|https://www.cs.nccu.edu.tw/web/news/news_in.jsp?np_no=NP1652951469677": "大學申請入學第二階段甄試 APCS組筆試異動",
   "政大資科|https://www.cs.nccu.edu.tw/web/news/news_in.jsp?np_no=NP1653019064525": "大學申請入學第二階段甄試--問卷調查",
   "雲科資管|https://cms.mis.yuntech.edu.tw/sites/default/files/2026-11/116%E5%AD%B8%E5%B9%B4%E5%BA%A6%E8%B3%87%E7%AE%A1%E7%B3%BB%E7%A2%A9%E5%A3%AB%E7%8F%AD%E7%94%84%E8%A9%A6%E5%85%A5%E5%AD%B8%E5%8F%A3%E8%A9%A6%E5%A0%B1%E5%88%B0%E6%99%82%E9%96%93%E8%A1%A8.pdf": "116 學年度資管系碩士班甄試入學口試報到時間表",
   "雲科資管|https://www.mis.yuntech.edu.tw/announcements/1277-116%E5%AD%B8%E5%B9%B4%E5%BA%A6%E8%B3%87%E7%AE%A1%E7%B3%BB%E7%A2%A9%E5%A3%AB%E7%8F%AD%E7%94%84%E8%A9%A6%E5%85%A5%E5%AD%B8%E9%9D%A2%E8%A9%A6%E5%85%AC%E5%91%8A%E2%94%8011_14(%E5%85%AD)": "1277-116學年度資管系碩士班甄試入學面試公告─11_14(六)",
+  "雲科資管|https://www.mis.yuntech.edu.tw/announcements/1277-116%E5%AD%B8%E5%B9%B4%E5%BA%A6%E8%B3%87%E7%AE%A1%E7%B3%BB%E7%A2%A9%E5%A3%AB%E7%8F%AD%E7%94%84%E8%A9%A6%E5%85%A5%E5%AD%B8%E9%9D%A2%E8%A9%A6%E5%85%AC%E5%91%8A%E2%94%8011_14(%E5%85%AD)#article-related": "µ¤źń£ŗÕģ©ķā©ńøĖķŚ£Õģ¦Õ«╣ Ōåō 1277-116學年度資管系碩士班甄試入學面試公告─11_14(六)",
+  "雲科資管|https://www.mis.yuntech.edu.tw/announcements/1277-116%E5%AD%B8%E5%B9%B4%E5%BA%A6%E8%B3%87%E7%AE%A1%E7%B3%BB%E7%A2%A9%E5%A3%AB%E7%8F%AD%E7%94%84%E8%A9%A6%E5%85%A5%E5%AD%B8%E9%9D%A2%E8%A9%A6%E5%85%AC%E5%91%8A%E2%94%8011_14(%E5%85%AD)#main-content": "ĶĘ│Ķć│õĖ╗Ķ”üÕģ¦Õ«╣ 1277-116學年度資管系碩士班甄試入學面試公告─11_14(六)",
+  "雲科資管|https://www.mis.yuntech.edu.tw/announcements/1283-116%E5%AD%B8%E5%B9%B4%E5%BA%A6%E7%A2%A9%E5%A3%AB%E7%8F%AD%E5%85%A5%E5%AD%B8%E6%8B%9B%E7%94%9F%EF%BC%8812_2%EF%BD%9E1_4%E7%B6%B2%E8%B7%AF%E5%A0%B1%E5%90%8D%EF%BC%89": "1283-116學年度碩士班入學招生（12_2～1_4網路報名）",
   "雲科資管|https://www.mis.yuntech.edu.tw/en/announcements/1277-116%E5%AD%B8%E5%B9%B4%E5%BA%A6%E8%B3%87%E7%AE%A1%E7%B3%BB%E7%A2%A9%E5%A3%AB%E7%8F%AD%E7%94%84%E8%A9%A6%E5%85%A5%E5%AD%B8%E9%9D%A2%E8%A9%A6%E5%85%AC%E5%91%8A%E2%94%8011_14(%E5%85%AD)": "EN 1277-116學年度資管系碩士班甄試入學面試公告─11_14(六)",
+  "雲科資管|https://www.mis.yuntech.edu.tw/en/announcements/1283-116%E5%AD%B8%E5%B9%B4%E5%BA%A6%E7%A2%A9%E5%A3%AB%E7%8F%AD%E5%85%A5%E5%AD%B8%E6%8B%9B%E7%94%9F%EF%BC%8812_2%EF%BD%9E1_4%E7%B6%B2%E8%B7%AF%E5%A0%B1%E5%90%8D%EF%BC%89": "EN 1283-116學年度碩士班入學招生（12_2～1_4網路報名）",
   "雲科資管|https://www.mis.yuntech.edu.tw/en/pages/970-%E7%A2%A9%E5%A3%AB%E7%8F%AD#image-%E7%A2%A9%E5%A3%AB%E7%8F%AD%E7%94%84%E8%A9%A6%E5%85%A5%E5%AD%B8%E4%B8%80%E8%88%AC%E7%94%9F": "Image 碩士班甄試入學(一般生) Image 碩士班甄試入學(一般生)",
   "雲科資管|https://www.mis.yuntech.edu.tw/pages/970-%E7%A2%A9%E5%A3%AB%E7%8F%AD#image-%E7%A2%A9%E5%A3%AB%E7%8F%AD%E7%94%84%E8%A9%A6%E5%85%A5%E5%AD%B8%E4%B8%80%E8%88%AC%E7%94%9F": "Image 碩士班甄試入學(一般生) Image 碩士班甄試入學(一般生)",
   "雲科資管|https://www.mis.yuntech.edu.tw/sites/default/files/2026-11/116%E5%AD%B8%E5%B9%B4%E5%BA%A6%E8%B3%87%E7%AE%A1%E7%B3%BB%E7%A2%A9%E5%A3%AB%E7%8F%AD%E7%94%84%E8%A9%A6%E5%85%A5%E5%AD%B8%E5%8F%A3%E8%A9%A6%E5%A0%B1%E5%88%B0%E6%99%82%E9%96%93%E8%A1%A8.pdf": "預覽 ： 116學年度資管系碩士班甄試入學口試報到時間表.pdf （ 另開新分頁 ）"
@@ -60,7 +72,7 @@
   "政大資管",
   "雲科資管"
  ],
- "last_run": "2026-11-17 09:32:08 UTC",
+ "last_run": "2026-11-19 08:31:40 UTC",
  "notices": {
   "中央|https://admission.ncu.edu.tw/p/406-1024-14019,r598.php?Lang=zh-tw": "116學年度碩士班甄試入學第一梯次錄取名單(僅初試直接錄取) 原頁面開啟",
   "中央|https://im.mgt.ncu.edu.tw/enrollment/9603/post": "【資訊管理學系複試公告】國立中央大學116學年度研究所甄試招生(碩士班)",
@@ -70,6 +82,8 @@
   "台科|https://www.admission.ntust.edu.tw/p/405-1052-153395,c8730.php?Lang=zh-tw": "116學年度碩博士班甄試招生擇優免參與口試、合於口試名單及口試時間地點資料表",
   "台科|https://www.admission.ntust.edu.tw/p/405-1052-153395,c8735.php?Lang=zh-tw": "116學年度碩博士班甄試招生擇優免參與口試、合於口試名單及口試時間地點資料表",
   "政大資科|https://www.cs.nccu.edu.tw/web/enrollment/enrollment_in.jsp?dm_no=DM1555054672218&np_no=NP1794813922546": "【公告】116學年度碩士班「-跨領域組」甄試入學招生面試名單",
+  "政大資科|https://www.cs.nccu.edu.tw/web/enrollment/enrollment_in.jsp?dm_no=DM1555054672218&np_no=NP1794970038104": "【公告】116學年度資訊工程系碩士班-智慧計算組甄試面試名單",
+  "政大資科|https://www.cs.nccu.edu.tw/web/enrollment/enrollment_in.jsp?dm_no=DM1555054672218&np_no=NP1794970572522": "【公告】116學年度碩士班-資訊系統組 甄試入學招生面試名單",
   "政大資管|https://mis2.nccu.edu.tw/xhr/announcements/file/67369bd9311fc8b9d6403339/%E9%99%84%E4%BB%B6%E4%B8%80_114%E7%A2%A9%E5%A3%AB%E7%8F%AD%E7%94%84%E8%A9%A6%E9%9D%A2%E8%A9%A6%E5%90%8D%E5%96%AE_%E7%B3%BB%E7%B6%B2%E5%85%AC%E5%91%8A%E7%89%88_.pdf": "附件一_114碩士班甄試面試名單_系網公告版_.pdf 附件一_114碩士班甄試面試名單_系網公告版_.pdf",
   "政大資管|https://mis2.nccu.edu.tw/xhr/announcements/file/67369bd9311fc8b9d640333a/%E9%99%84%E4%BB%B6%E4%BA%8C__114_%E5%AD%B8%E5%B9%B4%E5%BA%A6%E7%A2%A9%E5%A3%AB%E7%8F%AD%E7%94%84%E8%A9%A6%E9%9D%A2%E8%A9%A6%E9%A2%B1%E9%A2%A8%E6%87%89%E8%AE%8A%E6%8E%AA%E6%96%BD.pdf": "附件二__114_學年度碩士班甄試面試颱風應變措施.pdf 附件二__114_學年度碩士班甄試面試颱風應變措施.pdf",
   "政大資管|https://mis2.nccu.edu.tw/xhr/announcements/file/69167df2311fc81a158645f0/%E9%99%84%E4%BB%B6%E4%B8%80_115%E7%A2%A9%E5%A3%AB%E7%8F%AD%E7%94%84%E8%A9%A6%E9%9D%A2%E8%A9%A6%E5%90%8D%E5%96%AE_%E7%B3%BB%E7%B6%B2%E5%85%AC%E5%91%8A%E7%89%88_.pdf": "附件一_115碩士班甄試面試名單_系網公告版_.pdf 附件一_115碩士班甄試面試名單_系網公告版_.pdf",
