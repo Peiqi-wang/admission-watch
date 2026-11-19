@@ -362,7 +362,7 @@ QUICK_PAGES = [
     # (學校, 號碼設定, 網址)
     ("中央招生組", "NCU_ID", "https://admission.ncu.edu.tw/app/home.php"),
     # 首頁的公告是用 JavaScript 載入的，實際內容在這些公告列表頁（598 = 碩士班最新消息）
-    ("中央招生組", "NCU_ID", "https://admission.ncu.edu.tw/p/403-1024-598.php"),
+    ("中央碩士班最新消息", "NCU_ID", "https://admission.ncu.edu.tw/p/403-1024-598.php"),
     ("中央招生組", "NCU_ID", "https://admission.ncu.edu.tw/p/403-1024-328.php"),
     ("中央招生組", "NCU_ID", "https://admission.ncu.edu.tw/p/403-1024-329.php"),
     ("中央招生組", "NCU_ID", "https://admission.ncu.edu.tw/p/403-1024-608.php"),
@@ -395,6 +395,8 @@ def quick_main():
     session = requests.Session()
     lines, found = [], []
     seen_new = set()
+    all_known = {h for v in st.values() for h in v}
+    hit_names = set()
     changed = False
     for name, id_env, url in QUICK_PAGES:
         links = quick_links(session, url)
@@ -406,12 +408,17 @@ def quick_main():
             changed = True
             log(f"[{name}] 第一次記錄 {len(links)} 個連結為基準")
             continue
-        new = {h: t for h, t in links.items() if h not in known and h not in seen_new}
-        seen_new.update(new)
+        fresh = {h: t for h, t in links.items() if h not in known}
+        if not fresh:
+            continue
+        known.update(fresh)
+        changed = True
+        # 已經在別頁出現過（之前或這次）的公告不重複寄信
+        new = {h: t for h, t in fresh.items() if h not in seen_new and h not in all_known}
+        seen_new.update(fresh)
         if not new:
             continue
-        known.update(new)
-        changed = True
+        hit_names.add(name)
         ids = parse_ids(os.environ.get(id_env))
         for href, title in new.items():
             log(f"[{name}] 新連結：{title} | {href}")
@@ -424,7 +431,7 @@ def quick_main():
             json.dump(st, f, ensure_ascii=False, indent=1, sort_keys=True)
         os.replace(tmp, QUICK_STATE_FILE)
     if lines:
-        subject = ("✅ 名單有你！" if found else "🔔 網頁有新公告：") + "、".join(sorted({n for n, _, _ in QUICK_PAGES}))
+        subject = ("✅ 名單有你！" if found else "🔔 網頁有新公告：") + "、".join(sorted(hit_names))
         send_mail(subject, "\n\n".join(found + lines) + "\n\n（請點連結自行再確認一次。）")
     else:
         log("快速檢查：沒有新連結。")
