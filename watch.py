@@ -356,9 +356,80 @@ def send_mail(subject, body):
     log(f"已寄信到 {to}：{subject}")
 
 
+# ── 快速監看：每分鐘看一次這些網頁，只要出現新連結（新公告）就寄信 ──
+QUICK_STATE_FILE = "quick_state.json"
+QUICK_PAGES = [
+    # (學校, 號碼設定, 網址)
+    ("中央招生組", "NCU_ID", "https://admission.ncu.edu.tw/app/home.php"),
+    ("中央招生組", "NCU_ID", "https://admission.ncu.edu.tw/p/412-1024-2359.php"),  # 碩士班甄試
+    ("中央招生組", "NCU_ID", "https://admission.ncu.edu.tw/p/412-1024-2340.php"),  # 碩士班
+]
+# 只看同網域、去掉 #錨點 後的連結；固定的選單連結第一次就記進基準，不會被當成新公告
+
+
+def quick_links(session, url):
+    resp = fetch(session, url)
+    if resp is None:
+        return None
+    host = urlparse(url).hostname
+    out = {}
+    for text, href in page_links(resp):
+        href = href.split("#", 1)[0]
+        if urlparse(href).hostname != host or href.rstrip("/") == url.rstrip("/"):
+            continue
+        out.setdefault(href, text[:120])
+    return out
+
+
+def quick_main():
+    try:
+        with open(QUICK_STATE_FILE, encoding="utf-8") as f:
+            st = json.load(f)
+    except FileNotFoundError:
+        st = {}
+    session = requests.Session()
+    lines, found = [], []
+    seen_new = set()
+    changed = False
+    for name, id_env, url in QUICK_PAGES:
+        links = quick_links(session, url)
+        if links is None:
+            continue
+        known = st.get(url)
+        if known is None:  # 第一次：記錄現有連結為基準，不寄信
+            st[url] = links
+            changed = True
+            log(f"[{name}] 第一次記錄 {len(links)} 個連結為基準")
+            continue
+        new = {h: t for h, t in links.items() if h not in known and h not in seen_new}
+        seen_new.update(new)
+        if not new:
+            continue
+        known.update(new)
+        changed = True
+        ids = parse_ids(os.environ.get(id_env))
+        for href, title in new.items():
+            log(f"[{name}] 新連結：{title} | {href}")
+            for t, u, label, num in check_notice(session, href, title or href, ids):
+                found.append(f"✅ 你的{name}應考證號 {num} 出現在：{t}\n   {u}")
+            lines.append(f"🔔 {name}網頁有新公告：{title or '(無標題)'}\n   {href}")
+    if changed:
+        tmp = QUICK_STATE_FILE + ".tmp"
+        with open(tmp, "w", encoding="utf-8") as f:
+            json.dump(st, f, ensure_ascii=False, indent=1, sort_keys=True)
+        os.replace(tmp, QUICK_STATE_FILE)
+    if lines:
+        subject = ("✅ 名單有你！" if found else "🔔 網頁有新公告：") + "、".join(sorted({n for n, _, _ in QUICK_PAGES}))
+        send_mail(subject, "\n\n".join(found + lines) + "\n\n（請點連結自行再確認一次。）")
+    else:
+        log("快速檢查：沒有新連結。")
+
+
 def main():
     global DEBUG
     DEBUG = "--debug" in sys.argv
+    if "--quick" in sys.argv:
+        return quick_main()
     selftest = os.environ.get("SELFTEST_URL")
     if selftest:
         sid = os.environ.get("SELFTEST_ID", "")
@@ -377,6 +448,9 @@ def main():
         if r is not None:
             for t, h in page_links(r):
                 log(f"LINK {t[:90]} | {h}")
+            # 公告若是用 JavaScript 另外載入，印出原始碼裡載入用的網址，方便找出公告來源
+            for m in sorted(set(re.findall(r"[^\s'\"<>()]*(?:loadmod|Action=|\.php\?[^\s'\"<>]*Nbr)[^\s'\"<>()]*", r.text)))[:60]:
+                log(f"RAW {m}")
         return
     test_mail = "--test-mail" in sys.argv
     st = load_state()

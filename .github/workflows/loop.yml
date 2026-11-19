@@ -53,6 +53,7 @@ jobs:
             [ $left -gt 0 ] && sleep $left
           done
       - name: 接力：觸發下一輪
+        # 下面的 quick 工作同時在跑；這一步只放在這裡，避免觸發兩次
         if: always()
         env:
           GH_TOKEN: ${{ github.token }}
@@ -63,3 +64,37 @@ jobs:
             "https://api.github.com/repos/${{ github.repository }}/actions/workflows/loop.yml/dispatches" \
             -d '{"ref":"main"}'
           echo "已觸發下一輪"
+
+  # 每 1 分鐘看一次指定網頁（中央招生組首頁），只要出現新連結就寄信
+  quick:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: 每 1 分鐘快速檢查一次（約 5.5 小時）
+        env:
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
+          NCU_ID: ${{ secrets.NCU_ID }}
+        run: |
+          git config user.name "admission-watch"
+          git config user.email "admission-watch@users.noreply.github.com"
+          end=$(( $(date +%s) + 330*60 ))
+          while [ $(date +%s) -lt $end ]; do
+            start=$(date +%s)
+            git pull -q --rebase || true
+            python watch.py --quick || echo "快速檢查發生錯誤，1 分鐘後再試"
+            git add quick_state.json 2>/dev/null || true
+            if ! git diff --cached --quiet; then
+              git commit -qm "update quick state"
+              for t in 1 2 3; do git pull -q --rebase && git push -q && break; sleep 5; done
+            fi
+            left=$(( 60 - ($(date +%s) - start) ))
+            [ $left -gt 0 ] && sleep $left
+          done
