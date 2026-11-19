@@ -361,6 +361,11 @@ QUICK_STATE_FILE = "quick_state.json"
 QUICK_PAGES = [
     # (學校, 號碼設定, 網址)
     ("中央招生組", "NCU_ID", "https://admission.ncu.edu.tw/app/home.php"),
+    # 首頁的公告是用 JavaScript 載入的，實際內容在這些公告列表頁（598 = 碩士班最新消息）
+    ("中央招生組", "NCU_ID", "https://admission.ncu.edu.tw/p/403-1024-598.php"),
+    ("中央招生組", "NCU_ID", "https://admission.ncu.edu.tw/p/403-1024-328.php"),
+    ("中央招生組", "NCU_ID", "https://admission.ncu.edu.tw/p/403-1024-329.php"),
+    ("中央招生組", "NCU_ID", "https://admission.ncu.edu.tw/p/403-1024-608.php"),
     ("中央招生組", "NCU_ID", "https://admission.ncu.edu.tw/p/412-1024-2359.php"),  # 碩士班甄試
     ("中央招生組", "NCU_ID", "https://admission.ncu.edu.tw/p/412-1024-2340.php"),  # 碩士班
 ]
